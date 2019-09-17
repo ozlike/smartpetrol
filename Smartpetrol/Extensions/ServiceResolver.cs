@@ -22,7 +22,8 @@ namespace Smartpetrol
         {
             container = new WindsorContainer();
 
-            //container.Register(Component.For<>().LifestyleSingleton());
+            container.Register(Component.For<IUserProvider>().ImplementedBy<UserProvider>().LifestyleTransient());
+            //container.Register(Component.For<IMapper>());
             
             serviceProvider = WindsorRegistrationHelper.CreateServiceProvider(container, services);
 
@@ -40,23 +41,20 @@ namespace Smartpetrol
 
         private async Task ADD_INIT_VALUES_INTO_DB_TEMPORARY_FUNC(SmartDbContext smartDbContext, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
-            if (smartDbContext.Roles.Count() == 0)
+            if (!smartDbContext.Roles.Any())
             {
                 await roleManager.CreateAsync(new IdentityRole(Roles.Admin));
                 await roleManager.CreateAsync(new IdentityRole(Roles.Librarian));
                 await roleManager.CreateAsync(new IdentityRole(Roles.Client));
             }
 
-            if (smartDbContext.Users.Count() == 0)
+            if (!smartDbContext.Users.Any())
             {
-                var admin = new IdentityUser
-                {
-                    UserName = "Administrator",
-                };
-                await userManager.CreateAsync(admin);
-                await userManager.AddPasswordAsync(admin, "Qwerty123!");
-                await userManager.SetEmailAsync(admin, "red@black.me");
-                await userManager.AddToRoleAsync(admin, Roles.Admin);
+                var email = "red@black.me";
+                var admin = new IdentityUser { UserName = email, Email = email };
+                var result = await userManager.CreateAsync(admin, "Qwerty123!");
+                if (result.Succeeded)
+                    await userManager.AddToRoleAsync(admin, Roles.Admin);
             }
         }
     }

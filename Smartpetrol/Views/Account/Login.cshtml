@@ -7,7 +7,7 @@
 
 <div class="content">
     <h2 class="main-title">Вход</h2>
-    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { returnUrl = ViewData["ReturnUrl"] }))
     {
         @Html.AntiForgeryToken()
 

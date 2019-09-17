@@ -49,7 +49,8 @@ namespace Smartpetrol
                 options.Password.RequireUppercase = false;
             })
             .AddEntityFrameworkStores<SmartDbContext>();
-            
+            services.AddHttpContextAccessor();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             var container = new ServiceResolver(services).GetServiceProvider();
@@ -72,6 +73,7 @@ namespace Smartpetrol
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

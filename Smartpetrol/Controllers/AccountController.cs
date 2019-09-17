@@ -26,15 +26,13 @@ namespace Smartpetrol.Controllers
             _signInManager = signInManager;
         }
 
-        [TempData]
-        public string ErrorMessage { get; set; }
+        [TempData] public string ErrorMessage { get; set; }
 
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
+            if (HttpContext.User.Identity.IsAuthenticated) return RedirectToHome();
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -44,10 +42,12 @@ namespace Smartpetrol.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
+            if (HttpContext.User.Identity.IsAuthenticated) return RedirectToHome();
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe,
+                    lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     return RedirectToLocal(returnUrl);
@@ -56,35 +56,6 @@ namespace Smartpetrol.Controllers
                 {
                     ModelState.AddModelError("", "Неправильный логин и (или) пароль");
                 }
-            }
-            
-            return View(model);
-        }
-        
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
-            {
-                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToLocal(returnUrl);
-                }
-                AddErrors(result);
             }
 
             return View(model);
@@ -95,17 +66,14 @@ namespace Smartpetrol.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         #region Helpers
-
-        private void AddErrors(IdentityResult result)
+        
+        private IActionResult RedirectToHome()
         {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+            return RedirectToAction("Index", "Home");
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -119,7 +87,6 @@ namespace Smartpetrol.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
-
         #endregion
     }
 }

@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+@model List<UserModel>
+
+<h2>Админ</h2>
+
+
+<a href="@Url.Action("RegisterUser", "Admin")">Регистрация пользователя</a>
+
+
+@foreach (var user in Model)
+{
+    <div>@user.Email</div>
+}
