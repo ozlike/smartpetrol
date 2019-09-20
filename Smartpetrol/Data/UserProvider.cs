@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smartpetrol.Models;
@@ -10,16 +11,18 @@ namespace Smartpetrol.Data
 {
     public class UserProvider : IUserProvider
     {
-        private readonly SmartDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        readonly SmartDbContext _context;
+        readonly UserManager<IdentityUser> _userManager;
+        readonly HttpContext _httpContext;
 
-        public UserProvider(SmartDbContext context, UserManager<IdentityUser> userManager)
+        public UserProvider(SmartDbContext context, UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
+            _httpContext = httpContextAccessor.HttpContext;
         }
 
-
+        
 
 
         public async Task<ICollection<UserModel>> GetAllUsers()
@@ -33,10 +36,33 @@ namespace Smartpetrol.Data
                     Id = user.Id,
                     Email = user.Email,
                     UserName = user.UserName,
-                    RoleName = (await _userManager.GetRolesAsync(user)).SingleOrDefault(),
+                    RoleFullNames = string.Join(", ", (await _userManager.GetRolesAsync(user))),
                 });
             }
             return users;
+        }
+
+
+
+        public async Task<List<string>> GetRoles()
+        {
+            return (await _userManager.GetRolesAsync(await GetCurrentUserAsync())).ToList();
+        }
+
+        public bool IsAuthenticated
+        {
+            get
+            {
+                return _httpContext.User.Identity.IsAuthenticated;
+            }
+        }
+
+        public Task<IdentityUser> GetCurrentUserAsync() => _userManager.GetUserAsync(_httpContext.User);
+
+        public async Task<bool> UserHasRole(RoleName role)
+        {
+            return (await GetRoles()).Any(x =>
+                string.Equals(x, role.ToString()));
         }
     }
 }

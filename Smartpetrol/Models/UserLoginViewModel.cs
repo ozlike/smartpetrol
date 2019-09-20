@@ -2,7 +2,7 @@
 
 namespace Smartpetrol.Models
 {
-    public class LoginViewModel
+    public class UserLoginViewModel
     {
         [Required]
         [DataType(DataType.EmailAddress)]

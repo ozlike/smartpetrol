@@ -10,7 +10,6 @@ namespace Smartpetrol.Models
         public string Id { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
-        public string RoleName { get; set; }
-        public string RoleFullName { get; set; }
+        public string RoleFullNames { get; set; }
     }
 }

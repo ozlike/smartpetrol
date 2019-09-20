@@ -1,5 +1,5 @@
-﻿
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+﻿@using Smartpetrol.Data
+@inject IUserProvider userProvider
 
 <!DOCTYPE html>
 <html>
@@ -10,18 +10,36 @@
     <link href="/css/general.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
+    <nav>
+        <ul>
+            
+            
+
+            @if (await userProvider.UserHasRole(RoleName.Admin))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "Admin")">Администрирование</a>
+                </li>
+            }
+            @if (userProvider.IsAuthenticated)
+            {
+                <li>
+                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
+                    {
+                    @Html.AntiForgeryToken()
+                    <label class="log-out-btn">
+                        Выйти
+                        <input type="submit" hidden/>
+                    </label>
+                    }
+                </li>
+            }
+        </ul>
+    </nav>
     @RenderBody()
 
-    @if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-    {
-         using (Html.BeginForm("Logout", "Account", FormMethod.Post))
-         {
-             @Html.AntiForgeryToken()
-             <label class="log-out-btn">
-                 Выйти
-                 <input type="submit" hidden />
-             </label>
-         }
-    }
+
+
+
 </body>
 </html>

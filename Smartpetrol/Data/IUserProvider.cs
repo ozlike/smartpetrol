@@ -10,5 +10,9 @@ namespace Smartpetrol.Data
     public interface IUserProvider
     {
         Task<ICollection<UserModel>> GetAllUsers();
+        Task<List<string>> GetRoles();
+        Task<IdentityUser> GetCurrentUserAsync();
+        bool IsAuthenticated { get; }
+        Task<bool> UserHasRole(RoleName role);
     }
 }

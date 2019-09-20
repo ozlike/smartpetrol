@@ -11,4 +11,11 @@ namespace Smartpetrol.Data
         public const string Librarian = "Librarian";
         public const string Client = "Client";
     }
+
+    public enum RoleName
+    {
+        Admin = 0,
+        Librarian = 1,
+        Client = 2,
+    }
 }

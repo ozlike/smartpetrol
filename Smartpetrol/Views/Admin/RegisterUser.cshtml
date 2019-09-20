@@ -3,13 +3,18 @@
     ViewData["Title"] = "RegisterUser";
 }
 
-@model Smartpetrol.Models.RegisterViewModel
+@using Smartpetrol.Data
+@model RegisterUserViewModel
 
 <div class="content">
     <h2 class="main-title">Регистрация нового пользователя</h2>
     @using (Html.BeginForm("RegisterUser", "Admin", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
+
+        <label asp-for="UserName" class="middle-sign"></label>
+        <input asp-for="UserName" type="text" class="input-text" />
+        <span asp-validation-for="UserName"></span>
 
         <label asp-for="Email" class="middle-sign"></label>
         <input asp-for="Email" type="email" class="input-text" />
@@ -22,6 +27,15 @@
         <label asp-for="PasswordConfirm" class="middle-sign"></label>
         <input asp-for="PasswordConfirm" type="password" class="input-text" />
         <span asp-validation-for="PasswordConfirm"></span>
+
+        @*<label asp-for="Roles" class="middle-sign"></label>
+        <label>
+            <input asp-for="Roles" type="checkbox" value="@RoleName.Client" class="input-text" />
+            @RoleName.Client
+        </label>
+        <input asp-for="Roles" type="checkbox" value="@RoleName.Librarian" class="input-text" />
+        <input asp-for="Roles" type="checkbox" value="@RoleName.Admin" class="input-text" />
+        <span asp-validation-for="Roles"></span>*@
 
         <div asp-validation-summary="ModelOnly"></div>
 

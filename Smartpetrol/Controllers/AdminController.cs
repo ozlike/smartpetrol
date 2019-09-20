@@ -34,7 +34,7 @@ namespace Smartpetrol.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RegisterUser(RegisterViewModel model)
+        public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
@@ -48,6 +48,13 @@ namespace Smartpetrol.Controllers
             foreach (var error in result.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult EditUser(string userId)
+        {
+
+            return View();
         }
     }
 }

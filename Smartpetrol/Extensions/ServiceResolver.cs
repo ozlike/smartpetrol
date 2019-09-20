@@ -54,7 +54,11 @@ namespace Smartpetrol
                 var admin = new IdentityUser { UserName = email, Email = email };
                 var result = await userManager.CreateAsync(admin, "Qwerty123!");
                 if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, Roles.Client);
+                    await userManager.AddToRoleAsync(admin, Roles.Librarian);
                     await userManager.AddToRoleAsync(admin, Roles.Admin);
+                }
             }
         }
     }
