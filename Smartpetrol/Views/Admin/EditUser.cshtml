@@ -22,8 +22,8 @@
     <label asp-for="Password" class="middle-sign"></label>
     <input asp-for="Password" type="password" class="input-text" placeholder="Оставить поле пустым" />
     <span asp-validation-for="Password"></span>
-    
-                                       
+
+
     <label asp-for="RolesList" class="middle-sign"></label>
     <ul>
         @for (int i = 0; i < Model.RolesList.Roles.Count; i++)
@@ -36,8 +36,28 @@
         }
     </ul>
 
-    <input type="text" hidden asp-for="Id" />
+    <input type="text" name="Id" value="@Model.Id" hidden />
     <div asp-validation-summary="ModelOnly"></div>
 
     <input type="submit" value="Сохранить" class="button no-select" />
 }
+
+@using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="text" name="userId" value="@Model.Id" hidden />
+    <input type="submit" value="Удалить пользователя" class="button no-select" disabled id="deleteUserBtn"/>
+}
+
+<label class="no-select">
+    <input type="checkbox" id="deleteUserCheckbox" />
+    Подтвердить удаление
+</label>
+
+<script type="text/javascript">
+    document.getElementById("deleteUserCheckbox").addEventListener("change", function (e) {
+        let btn = document.getElementById("deleteUserBtn");
+        if (e.target.checked) btn.removeAttribute("disabled");
+        else btn.setAttribute("disabled", "disabled");
+    });
+</script>

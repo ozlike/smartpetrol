@@ -16,16 +16,19 @@ namespace Smartpetrol.Data
         readonly UserManager<User> _userManager;
         readonly HttpContext _httpContext;
         readonly SignInManager<User> _signInManager;
+        readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserProvider(SmartDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, IHttpContextAccessor httpContextAccessor)
+        public UserProvider(SmartDbContext context, SignInManager<User> signInManager, UserManager<User> userManager,
+            IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _httpContext = httpContextAccessor.HttpContext;
         }
 
-        
+
         public async Task<ICollection<UserModel>> GetAllUsersAsync()
         {
             //TODO: Automapper
@@ -40,15 +43,17 @@ namespace Smartpetrol.Data
                     RoleFullNames = string.Join(", ", (await _userManager.GetRolesAsync(user))),
                 });
             }
+
             return users;
         }
 
 
         private async Task<List<string>> GetRolesAsync()
         {
-            return await GetRoles(await GetCurrentUserAsync());
+            return await GetRolesAsync(await GetCurrentUserAsync());
         }
-        private async Task<List<string>> GetRoles(User user)
+
+        private async Task<List<string>> GetRolesAsync(User user)
         {
             if (user == null) return new List<string>();
             return (await _userManager.GetRolesAsync(user)).ToList();
@@ -56,10 +61,7 @@ namespace Smartpetrol.Data
 
         public bool IsAuthenticated
         {
-            get
-            {
-                return _httpContext.User.Identity.IsAuthenticated;
-            }
+            get { return _httpContext.User.Identity.IsAuthenticated; }
         }
 
         public Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(_httpContext.User);
@@ -67,14 +69,19 @@ namespace Smartpetrol.Data
 
         public async Task<bool> UserHasRoleAsync(RoleName role)
         {
-            return (await GetRolesAsync()).Any(x =>
+            return await UserHasRoleAsync(await GetCurrentUserAsync(), role);
+        }
+
+        private async Task<bool> UserHasRoleAsync(User user, RoleName role)
+        {
+            return (await GetRolesAsync(user)).Any(x =>
                 string.Equals(x, role.ToString()));
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterUserViewModel model)
         {
-            var user = new User { UserName = model.Email, Email = model.Email, FirstName = model.FirstName };
-            
+            var user = new User {UserName = model.Email, Email = model.Email, FirstName = model.FirstName};
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded) return result;
 
@@ -109,12 +116,12 @@ namespace Smartpetrol.Data
             {
                 Id = user.Id,
                 Email = user.Email,
-                FirstName =  user.FirstName,
+                FirstName = user.FirstName,
             };
 
-            var roles = await GetRoles(user);
+            var roles = await GetRolesAsync(user);
             model.RolesList.Roles.ForEach(x => x.Selected = roles.Contains(x.RoleName.ToString()));
-            
+
             return model;
         }
 
@@ -197,7 +204,8 @@ namespace Smartpetrol.Data
 
         private async Task<List<IdentityResult>> UpdateRolesAsync(User user, List<RoleSelection> newRoles)
         {
-            var userRole = (await GetRoles(user)).ToEnumList<RoleName>();
+            var userRole = (await GetRolesAsync(user)).ToEnumList<RoleName>();
+            var isLastAdmin = await IsLastAdminAsync(user);
             List<IdentityResult> results = new List<IdentityResult>();
             foreach (var roleSelection in newRoles)
             {
@@ -205,6 +213,8 @@ namespace Smartpetrol.Data
                 {
                     if (!roleSelection.Selected)
                     {
+                        if (isLastAdmin && roleSelection.RoleName == RoleName.Admin)
+                            continue;
                         results.Add(await _userManager.RemoveFromRoleAsync(user, roleSelection.RoleName.ToString()));
                     }
                 }
@@ -223,6 +233,36 @@ namespace Smartpetrol.Data
             }
 
             return results;
+        }
+
+        public async Task<IdentityResult> DeleteUserAsync(string userId)
+        {
+            List<IdentityResult> results = new List<IdentityResult>();
+            var user = await GetUserByIdAsync(userId);
+            if (await IsLastAdminAsync(user)) return IdentityResult.Failed();
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                foreach (var role in userRoles)
+                {
+                    results.Add(await _userManager.RemoveFromRoleAsync(user, role));
+                }
+
+                results.Add(await _userManager.DeleteAsync(user));
+                transaction.Commit();
+            }
+
+            return MergeResult(results);
+        }
+
+        private async Task<bool> IsLastAdminAsync(User user)
+        {
+            var isAdmin = await UserHasRoleAsync(user, RoleName.Admin);
+            if (!isAdmin) return false;
+            var adminRole = await _roleManager.Roles.SingleOrDefaultAsync(x => x.Name == RoleName.Admin.ToString());
+            return await _context.UserRoles.CountAsync(x => string.Equals(x.RoleId, adminRole.Id)) == 1;
         }
     }
 }

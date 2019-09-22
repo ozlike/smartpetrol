@@ -18,5 +18,6 @@ namespace Smartpetrol.Data
         Task<User> GetCurrentUserAsync();
         Task<EditUserViewModel> GetUserToEditAsync(string userId);
         Task<IdentityResult> EditUserAsync(EditUserViewModel model);
+        Task<IdentityResult> DeleteUserAsync(string userId);
     }
 }

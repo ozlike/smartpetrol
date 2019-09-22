@@ -65,5 +65,18 @@ namespace Smartpetrol.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var result = await _userProvider.DeleteUserAsync(userId);
+            if (result.Succeeded)
+            {
+                return View("ShowMessage", new MessageModel("/Admin/Index", "Пользователь успешно удалён", false));
+            }
+
+            return View("ShowMessage", new MessageModel("/Admin/Index", "Произошла ошибки при удалении", true));
+        }
     }
 }
