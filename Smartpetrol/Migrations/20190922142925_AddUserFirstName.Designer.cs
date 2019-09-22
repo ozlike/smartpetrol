@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Smartpetrol.Data;
@@ -9,9 +10,10 @@ using Smartpetrol.Data;
 namespace Smartpetrol.Migrations
 {
     [DbContext(typeof(SmartDbContext))]
-    partial class SmartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190922142925_AddUserFirstName")]
+    partial class AddUserFirstName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

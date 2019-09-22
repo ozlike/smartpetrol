@@ -7,7 +7,7 @@ namespace Smartpetrol.Models
     public class RegisterUserViewModel
     {
         [Display(Name = "Имя пользователя")]
-        public string UserName { get; set; }
+        public string FirstName { get; set; }
 
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Электронная почта")]

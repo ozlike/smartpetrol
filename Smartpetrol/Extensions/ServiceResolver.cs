@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Smartpetrol.Data;
+using Smartpetrol.Models;
 
 namespace Smartpetrol
 {
@@ -30,7 +31,7 @@ namespace Smartpetrol
             ADD_INIT_VALUES_INTO_DB_TEMPORARY_FUNC(
                 serviceProvider.GetService<SmartDbContext>(),
                 serviceProvider.GetService<RoleManager<IdentityRole>>(),
-                serviceProvider.GetService<UserManager<IdentityUser>>())
+                serviceProvider.GetService<UserManager<User>>())
                 .Wait();
         }
 
@@ -39,7 +40,7 @@ namespace Smartpetrol
             return serviceProvider;
         }
 
-        private async Task ADD_INIT_VALUES_INTO_DB_TEMPORARY_FUNC(SmartDbContext smartDbContext, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        private async Task ADD_INIT_VALUES_INTO_DB_TEMPORARY_FUNC(SmartDbContext smartDbContext, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             if (!smartDbContext.Roles.Any())
             {
@@ -51,7 +52,7 @@ namespace Smartpetrol
             if (!smartDbContext.Users.Any())
             {
                 var email = "red@black.me";
-                var admin = new IdentityUser { UserName = email, Email = email };
+                var admin = new User { UserName = email, Email = email };
                 var result = await userManager.CreateAsync(admin, "Qwerty123!");
                 if (result.Succeeded)
                 {

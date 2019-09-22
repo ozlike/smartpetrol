@@ -14,7 +14,7 @@
 @foreach (var user in Model)
 {
     <a href="@Url.Action("EditUser", "Admin", new { userId = user.Id})">
-        <div>@user.UserName</div>
+        <div>@user.Name</div>
         <div>@user.Email</div>
         <div>@user.RoleFullNames</div>
     </a>

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using Smartpetrol.Data;
 using Smartpetrol.Models;
 
 namespace Smartpetrol.Controllers
@@ -17,13 +18,11 @@ namespace Smartpetrol.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IUserProvider _userProvider;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(IUserProvider userProvider)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _userProvider = userProvider;
         }
 
         [TempData] public string ErrorMessage { get; set; }
@@ -40,24 +39,23 @@ namespace Smartpetrol.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(UserLoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginUserViewModel model, string returnUrl = null)
         {
             if (HttpContext.User.Identity.IsAuthenticated) return RedirectToHome();
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
-            {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe,
-                    lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    return RedirectToLocal(returnUrl);
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Неправильный логин и (или) пароль");
-                }
-            }
+            if (!ModelState.IsValid) return View(model);
 
+            var result = await _userProvider.LoginUser(model);
+                
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(returnUrl);
+            }
+            else
+            {
+                ModelState.AddModelError("", "Неправильный логин и (или) пароль");
+            }
+            
             return View(model);
         }
 
@@ -65,7 +63,7 @@ namespace Smartpetrol.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _userProvider.Logout();
             return RedirectToAction("Login", "Account");
         }
 

@@ -13,11 +13,9 @@ namespace Smartpetrol.Controllers
     [Authorize(Roles = Roles.Admin)]
     public class AdminController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserProvider _userProvider;
-        public AdminController(UserManager<IdentityUser> userManager, IUserProvider userProvider)
+        public AdminController(IUserProvider userProvider)
         {
-            _userManager = userManager;
             _userProvider = userProvider;
         }
 
@@ -37,9 +35,7 @@ namespace Smartpetrol.Controllers
         public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-
-            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userProvider.RegisterUser(model);
             if (result.Succeeded)
             {
                 return View("ShowMessage", new MessageModel("/Admin/Index", "Пользователь успешно создан", false));

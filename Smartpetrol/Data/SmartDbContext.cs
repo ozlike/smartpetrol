@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Smartpetrol.Models;
 
 namespace Smartpetrol.Data
 {
@@ -14,5 +15,7 @@ namespace Smartpetrol.Data
         {
             Database.EnsureCreated();
         }
+
+        public virtual DbSet<User> Users { get; set; }
     }
 }

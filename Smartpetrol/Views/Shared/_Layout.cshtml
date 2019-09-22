@@ -15,14 +15,15 @@
             
             
 
-            @if (await userProvider.UserHasRole(RoleName.Admin))
-            {
-                <li>
-                    <a href="@Url.Action("Index", "Admin")">Администрирование</a>
-                </li>
-            }
             @if (userProvider.IsAuthenticated)
             {
+                if (await userProvider.UserHasRole(RoleName.Admin))
+                {
+                    <li>
+                        <a href="@Url.Action("Index", "Admin")">Администрирование</a>
+                    </li>
+                }
+
                 <li>
                     @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
                     {
@@ -32,6 +33,13 @@
                         <input type="submit" hidden/>
                     </label>
                     }
+                </li>
+            }
+            else
+            {
+                
+                <li>
+                    <a href="@Url.Action("Login", "Account")">Войти</a>
                 </li>
             }
         </ul>
