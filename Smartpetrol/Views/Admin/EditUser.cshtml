@@ -3,3 +3,41 @@
     ViewData["Title"] = "Редактировать пользователя";
 }
 
+
+@using Smartpetrol.Data
+@model EditUserViewModel
+
+@using (Html.BeginForm("EditUser", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <label asp-for="FirstName" class="middle-sign"></label>
+    <input asp-for="FirstName" type="text" autocomplete="false" class="input-text" />
+    <span asp-validation-for="FirstName"></span>
+
+    <label asp-for="Email" class="middle-sign"></label>
+    <input asp-for="Email" type="email" autocomplete="false" class="input-text" />
+    <span asp-validation-for="Email"></span>
+
+    <label asp-for="Password" class="middle-sign"></label>
+    <input asp-for="Password" type="password" class="input-text" placeholder="Оставить поле пустым" />
+    <span asp-validation-for="Password"></span>
+    
+                                       
+    <label asp-for="RolesList" class="middle-sign"></label>
+    <ul>
+        @for (int i = 0; i < Model.RolesList.Roles.Count; i++)
+        {
+            <li>
+                <label asp-for="@Model.RolesList.Roles[i].Selected">@Model.RolesList.Roles[i].RoleName</label>
+                <input type="checkbox" asp-for="@Model.RolesList.Roles[i].Selected" />
+                <input type="hidden" asp-for="@Model.RolesList.Roles[i].RoleName" />
+            </li>
+        }
+    </ul>
+
+    <input type="text" hidden asp-for="Id" />
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <input type="submit" value="Сохранить" class="button no-select" />
+}

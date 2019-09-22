@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Smartpetrol.Data;
 using Smartpetrol.Models;
 
-namespace Smartpetrol
+namespace Smartpetrol.Extensions
 {
     public class ServiceResolver
     {

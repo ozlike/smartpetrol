@@ -9,12 +9,14 @@ namespace Smartpetrol.Data
 {
     public interface IUserProvider
     {
-        Task<ICollection<UserModel>> GetAllUsers();
-        Task<User> GetCurrentUserAsync();
+        Task<ICollection<UserModel>> GetAllUsersAsync();
         bool IsAuthenticated { get; }
-        Task<bool> UserHasRole(RoleName role);
-        Task<IdentityResult> RegisterUser(RegisterUserViewModel model);
-        Task<SignInResult> LoginUser(LoginUserViewModel model);
-        Task Logout();
+        Task<bool> UserHasRoleAsync(RoleName role);
+        Task<IdentityResult> RegisterUserAsync(RegisterUserViewModel model);
+        Task<SignInResult> LoginUserAsync(LoginUserViewModel model);
+        Task LogoutAsync();
+        Task<User> GetCurrentUserAsync();
+        Task<EditUserViewModel> GetUserToEditAsync(string userId);
+        Task<IdentityResult> EditUserAsync(EditUserViewModel model);
     }
 }

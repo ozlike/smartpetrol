@@ -1,0 +1,32 @@
+﻿
+
+
+
+.users-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 35px;
+    border: 1px #aaa solid;
+}
+
+.users-table thead th {
+    padding: 15px 0;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    background-color: #cfcfcf;
+}
+
+.users-table tbody td {
+    padding: 10px 5px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.users-table tr:first-child {
+    font-weight: bold;
+}
+
+.users-table tr {
+    border-bottom: 1px #aaa solid;
+}

@@ -12,17 +12,15 @@ namespace Smartpetrol.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController()
+        readonly IUserProvider _userProvider;
+        public HomeController(IUserProvider userProvider)
         {
-
+            _userProvider = userProvider;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-
-
-
-            return View();
+            return View(await _userProvider.GetCurrentUserAsync());
         }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

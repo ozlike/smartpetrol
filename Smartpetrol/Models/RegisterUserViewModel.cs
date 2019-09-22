@@ -27,7 +27,6 @@ namespace Smartpetrol.Models
         public string PasswordConfirm { get; set; }
 
         [Display(Name = "Роль пользователя")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Роль должна быть выбрана")]
-        public List<RoleName> Roles { get; set; }
+        public RolesList RolesList { get; set; } = new RolesList();
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Smartpetrol.Extensions;
 using Smartpetrol.Models;
 
 namespace Smartpetrol.Data
@@ -25,7 +26,7 @@ namespace Smartpetrol.Data
         }
 
         
-        public async Task<ICollection<UserModel>> GetAllUsers()
+        public async Task<ICollection<UserModel>> GetAllUsersAsync()
         {
             //TODO: Automapper
             List<UserModel> users = new List<UserModel>();
@@ -43,11 +44,13 @@ namespace Smartpetrol.Data
         }
 
 
-
-        private async Task<List<string>> GetRoles()
+        private async Task<List<string>> GetRolesAsync()
         {
-            var user = await GetCurrentUserAsync();
-            if(user == null) return  new List<string>();
+            return await GetRoles(await GetCurrentUserAsync());
+        }
+        private async Task<List<string>> GetRoles(User user)
+        {
+            if (user == null) return new List<string>();
             return (await _userManager.GetRolesAsync(user)).ToList();
         }
 
@@ -60,28 +63,166 @@ namespace Smartpetrol.Data
         }
 
         public Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(_httpContext.User);
+        private Task<User> GetUserByIdAsync(string userId) => _context.Users.SingleOrDefaultAsync(x => x.Id == userId);
 
-        public async Task<bool> UserHasRole(RoleName role)
+        public async Task<bool> UserHasRoleAsync(RoleName role)
         {
-            return (await GetRoles()).Any(x =>
+            return (await GetRolesAsync()).Any(x =>
                 string.Equals(x, role.ToString()));
         }
 
-        public async Task<IdentityResult> RegisterUser(RegisterUserViewModel model)
+        public async Task<IdentityResult> RegisterUserAsync(RegisterUserViewModel model)
         {
             var user = new User { UserName = model.Email, Email = model.Email, FirstName = model.FirstName };
-            return await _userManager.CreateAsync(user, model.Password);
+            
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded) return result;
+
+            foreach (var role in model.RolesList.Roles)
+            {
+                if (role.Selected)
+                {
+                    await _userManager.AddToRoleAsync(user, role.RoleName.ToString());
+                }
+            }
+
+            return result;
         }
 
-        public async Task<SignInResult> LoginUser(LoginUserViewModel model)
+        public async Task<SignInResult> LoginUserAsync(LoginUserViewModel model)
         {
             return await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe,
                 lockoutOnFailure: false);
         }
 
-        public Task Logout()
+        public Task LogoutAsync()
         {
             return _signInManager.SignOutAsync();
+        }
+
+        public async Task<EditUserViewModel> GetUserToEditAsync(string userId)
+        {
+            if (userId == null) return null;
+            var user = await GetUserByIdAsync(userId);
+
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName =  user.FirstName,
+            };
+
+            var roles = await GetRoles(user);
+            model.RolesList.Roles.ForEach(x => x.Selected = roles.Contains(x.RoleName.ToString()));
+            
+            return model;
+        }
+
+        public async Task<IdentityResult> EditUserAsync(EditUserViewModel model)
+        {
+            List<IdentityResult> results = new List<IdentityResult>();
+            var user = await GetUserByIdAsync(model.Id);
+            results.Add(await UpdateFirstNameAsync(user, model.FirstName));
+            results.AddRange(await UpdateEmailAsync(user, model.Email));
+            results.AddRange(await UpdatePasswordAsync(user, model.Password));
+            results.AddRange(await UpdateRolesAsync(user, model.RolesList.Roles));
+            return MergeResult(results);
+        }
+
+        private IdentityResult MergeResult(List<IdentityResult> results)
+        {
+            IdentityResult badResult = null;
+            foreach (var result in results)
+            {
+                if (!result.Succeeded)
+                {
+                    if (badResult == null) badResult = new IdentityResult();
+                    foreach (var error in result.Errors)
+                        badResult.Errors.Append(error);
+                }
+            }
+
+            if (badResult != null) return badResult;
+            return IdentityResult.Success;
+        }
+
+        private async Task<IdentityResult> UpdateFirstNameAsync(User user, string newFirstName)
+        {
+            if (!string.Equals(user.FirstName, newFirstName))
+            {
+                user.FirstName = newFirstName;
+                return await _userManager.UpdateAsync(user);
+            }
+
+            return IdentityResult.Success;
+        }
+
+        private async Task<List<IdentityResult>> UpdateEmailAsync(User user, string newEmail)
+        {
+            List<IdentityResult> results = new List<IdentityResult>();
+            if (!string.Equals(user.Email, newEmail, StringComparison.CurrentCultureIgnoreCase))
+            {
+                results.Add(await _userManager.SetEmailAsync(user, newEmail));
+                if (!results.Last().Succeeded) return results;
+                await _userManager.UpdateNormalizedEmailAsync(user);
+
+                results.Add(await _userManager.SetUserNameAsync(user, newEmail));
+                if (!results.Last().Succeeded) return results;
+                await _userManager.UpdateNormalizedUserNameAsync(user);
+
+                results.Add(await _userManager.UpdateSecurityStampAsync(user));
+            }
+
+            return results;
+        }
+
+        private async Task<List<IdentityResult>> UpdatePasswordAsync(User user, string newPassword)
+        {
+            List<IdentityResult> results = new List<IdentityResult>();
+            if (!string.IsNullOrEmpty(newPassword))
+            {
+                var passwordValidator = new PasswordValidator<User>();
+                results.Add(await passwordValidator.ValidateAsync(_userManager, null, newPassword));
+                if (!results.Last().Succeeded) return results;
+
+                results.Add(await _userManager.RemovePasswordAsync(user));
+                if (!results.Last().Succeeded) return results;
+                results.Add(await _userManager.AddPasswordAsync(user, newPassword));
+
+                results.Add(await _userManager.UpdateSecurityStampAsync(user));
+            }
+
+            return results;
+        }
+
+        private async Task<List<IdentityResult>> UpdateRolesAsync(User user, List<RoleSelection> newRoles)
+        {
+            var userRole = (await GetRoles(user)).ToEnumList<RoleName>();
+            List<IdentityResult> results = new List<IdentityResult>();
+            foreach (var roleSelection in newRoles)
+            {
+                if (userRole.Contains(roleSelection.RoleName))
+                {
+                    if (!roleSelection.Selected)
+                    {
+                        results.Add(await _userManager.RemoveFromRoleAsync(user, roleSelection.RoleName.ToString()));
+                    }
+                }
+                else
+                {
+                    if (roleSelection.Selected)
+                    {
+                        results.Add(await _userManager.AddToRoleAsync(user, roleSelection.RoleName.ToString()));
+                    }
+                }
+            }
+
+            if (results.Count != 0)
+            {
+                results.Add(await _userManager.UpdateSecurityStampAsync(user));
+            }
+
+            return results;
         }
     }
 }

@@ -8,16 +8,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Smartpetrol</title>
     <link href="/css/general.css" rel="stylesheet" asp-append-version="true" />
+
+    @if (ViewBag.StylesInHead != null)
+    {
+        foreach (var path in ViewBag.StylesInHead)
+        {
+            <link href="@path" rel="stylesheet" asp-append-version="true" />
+        }
+    }
 </head>
 <body>
     <nav>
         <ul>
             
             
+            
 
             @if (userProvider.IsAuthenticated)
             {
-                if (await userProvider.UserHasRole(RoleName.Admin))
+                if (await userProvider.UserHasRoleAsync(RoleName.Admin))
                 {
                     <li>
                         <a href="@Url.Action("Index", "Admin")">Администрирование</a>
@@ -27,17 +36,17 @@
                 <li>
                     @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
                     {
-                    @Html.AntiForgeryToken()
-                    <label class="log-out-btn">
-                        Выйти
-                        <input type="submit" hidden/>
-                    </label>
+                        @Html.AntiForgeryToken()
+                        <label class="log-out-btn">
+                            Выйти
+                            <input type="submit" hidden/>
+                        </label>
                     }
                 </li>
             }
             else
             {
-                
+
                 <li>
                     <a href="@Url.Action("Login", "Account")">Войти</a>
                 </li>

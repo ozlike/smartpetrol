@@ -2,4 +2,9 @@
     ViewData["Title"] = "Home Page";
 }
 
-<h1>Библиотека!</h1>
+<h1>Библиотека</h1>
+
+@if(Model!=null){
+    
+    <h3>Добро пожаловать, @Model.FirstName</h3>
+}

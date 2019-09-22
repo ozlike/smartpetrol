@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Smartpetrol.Data;
+using Smartpetrol.Extensions;
 using Smartpetrol.Models;
 
 namespace Smartpetrol
@@ -51,6 +52,11 @@ namespace Smartpetrol
             })
             .AddEntityFrameworkStores<SmartDbContext>();
             services.AddHttpContextAccessor();
+
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.Zero;
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

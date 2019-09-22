@@ -45,7 +45,7 @@ namespace Smartpetrol.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _userProvider.LoginUser(model);
+            var result = await _userProvider.LoginUserAsync(model);
                 
             if (result.Succeeded)
             {
@@ -63,7 +63,7 @@ namespace Smartpetrol.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await _userProvider.Logout();
+            await _userProvider.LogoutAsync();
             return RedirectToAction("Login", "Account");
         }
 

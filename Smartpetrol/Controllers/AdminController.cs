@@ -21,13 +21,13 @@ namespace Smartpetrol.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _userProvider.GetAllUsers());
+            return View(await _userProvider.GetAllUsersAsync());
         }
 
         [HttpGet]
         public IActionResult RegisterUser()
         {
-            return View();
+            return View(new RegisterUserViewModel());
         }
 
         [HttpPost]
@@ -35,7 +35,7 @@ namespace Smartpetrol.Controllers
         public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-            var result = await _userProvider.RegisterUser(model);
+            var result = await _userProvider.RegisterUserAsync(model);
             if (result.Succeeded)
             {
                 return View("ShowMessage", new MessageModel("/Admin/Index", "Пользователь успешно создан", false));
@@ -47,10 +47,23 @@ namespace Smartpetrol.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditUser(string userId)
+        public async Task<IActionResult> EditUser(string userId)
         {
+            return View(await _userProvider.GetUserToEditAsync(userId));
+        }
 
-            return View();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+            var result = await _userProvider.EditUserAsync(model);
+            if (result.Succeeded)
+            {
+                return View("ShowMessage", new MessageModel("/Admin/Index", "Пользователь успешно обновлен", false));
+            }
+
+            return View(model);
         }
     }
 }
