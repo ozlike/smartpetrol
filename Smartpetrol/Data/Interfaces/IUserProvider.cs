@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Smartpetrol.Models;
+using Smartpetrol.Models.Users;
 
-namespace Smartpetrol.Data
+namespace Smartpetrol.Data.Interfaces
 {
     public interface IUserProvider
     {

@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Smartpetrol.Data;
 using Smartpetrol.Extensions;
 using Smartpetrol.Models;
+using Smartpetrol.Models.Users;
 
 namespace Smartpetrol
 {

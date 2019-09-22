@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Smartpetrol.Data;
 using Smartpetrol.Extensions;
 
-namespace Smartpetrol.Models
+namespace Smartpetrol.Models.Users
 {
     public class RolesList
     {

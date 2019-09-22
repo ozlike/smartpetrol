@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Smartpetrol.Models
+namespace Smartpetrol.Models.Users
 {
     public class LoginUserViewModel
     {

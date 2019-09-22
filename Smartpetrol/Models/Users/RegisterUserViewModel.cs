@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Smartpetrol.Data;
 
-namespace Smartpetrol.Models
+namespace Smartpetrol.Models.Users
 {
     public class RegisterUserViewModel
     {

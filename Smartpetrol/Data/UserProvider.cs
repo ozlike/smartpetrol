@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Smartpetrol.Data.Interfaces;
 using Smartpetrol.Extensions;
 using Smartpetrol.Models;
+using Smartpetrol.Models.Users;
 
 namespace Smartpetrol.Data
 {
@@ -32,7 +34,7 @@ namespace Smartpetrol.Data
         public async Task<ICollection<UserModel>> GetAllUsersAsync()
         {
             //TODO: Automapper
-            List<UserModel> users = new List<UserModel>();
+            var users = new List<UserModel>();
             foreach (var user in _context.Users.Select(x => x))
             {
                 users.Add(new UserModel
@@ -46,24 +48,15 @@ namespace Smartpetrol.Data
 
             return users;
         }
-
-
-        private async Task<List<string>> GetRolesAsync()
-        {
-            return await GetRolesAsync(await GetCurrentUserAsync());
-        }
-
+        
         private async Task<List<string>> GetRolesAsync(User user)
         {
             if (user == null) return new List<string>();
             return (await _userManager.GetRolesAsync(user)).ToList();
         }
 
-        public bool IsAuthenticated
-        {
-            get { return _httpContext.User.Identity.IsAuthenticated; }
-        }
-
+        public bool IsAuthenticated => _httpContext.User.Identity.IsAuthenticated;
+        
         public Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(_httpContext.User);
         private Task<User> GetUserByIdAsync(string userId) => _context.Users.SingleOrDefaultAsync(x => x.Id == userId);
 
@@ -227,7 +220,7 @@ namespace Smartpetrol.Data
                 }
             }
 
-            if (results.Count != 0)
+            if (results.Any())
             {
                 results.Add(await _userManager.UpdateSecurityStampAsync(user));
             }

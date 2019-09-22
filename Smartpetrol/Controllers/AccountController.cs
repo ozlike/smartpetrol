@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Smartpetrol.Data;
+using Smartpetrol.Data.Interfaces;
 using Smartpetrol.Models;
+using Smartpetrol.Models.Users;
 
 namespace Smartpetrol.Controllers
 {

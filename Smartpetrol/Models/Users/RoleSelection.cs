@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Smartpetrol.Data;
 
-namespace Smartpetrol.Models
+namespace Smartpetrol.Models.Users
 {
     public class RoleSelection
     {

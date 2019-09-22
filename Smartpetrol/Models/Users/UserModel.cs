@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Smartpetrol.Models
+namespace Smartpetrol.Models.Users
 {
     public class UserModel
     {

@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Smartpetrol.Data;
+using Smartpetrol.Data.Interfaces;
 using Smartpetrol.Models;
+using Smartpetrol.Models.Users;
 
 namespace Smartpetrol.Extensions
 {
@@ -24,8 +26,9 @@ namespace Smartpetrol.Extensions
             container = new WindsorContainer();
 
             container.Register(Component.For<IUserProvider>().ImplementedBy<UserProvider>().LifestyleTransient());
+            container.Register(Component.For<IBooksProvider>().ImplementedBy<BooksProvider>().LifestyleTransient());
             //container.Register(Component.For<IMapper>());
-            
+
             serviceProvider = WindsorRegistrationHelper.CreateServiceProvider(container, services);
 
             ADD_INIT_VALUES_INTO_DB_TEMPORARY_FUNC(
