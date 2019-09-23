@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,8 +15,11 @@ namespace Smartpetrol.Data
 
     public enum RoleName
     {
+        [DisplayName("Администратор")]
         Admin = 0,
+        [DisplayName("Библиотекарь")]
         Librarian = 1,
+        [DisplayName("Клиент")]
         Client = 2,
     }
 }

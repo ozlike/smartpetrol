@@ -5,6 +5,7 @@
 
 
 @using Smartpetrol.Data
+@using Smartpetrol.Extensions
 @model Smartpetrol.Models.Users.EditUserViewModel
 
 @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post))
@@ -29,7 +30,7 @@
         @for (int i = 0; i < Model.RolesList.Roles.Count; i++)
         {
             <li>
-                <label asp-for="@Model.RolesList.Roles[i].Selected">@Model.RolesList.Roles[i].RoleName</label>
+                <label asp-for="@Model.RolesList.Roles[i].Selected">@Model.RolesList.Roles[i].RoleName.GetDisplayNameAttribute()</label>
                 <input type="checkbox" asp-for="@Model.RolesList.Roles[i].Selected" />
                 <input type="hidden" asp-for="@Model.RolesList.Roles[i].RoleName" />
             </li>

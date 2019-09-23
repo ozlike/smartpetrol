@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,15 +20,17 @@ namespace Smartpetrol.Data
         readonly HttpContext _httpContext;
         readonly SignInManager<User> _signInManager;
         readonly RoleManager<IdentityRole> _roleManager;
+        readonly IMapper _mapper;
 
         public UserProvider(SmartDbContext context, SignInManager<User> signInManager, UserManager<User> userManager,
-            IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> roleManager)
+            IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> roleManager, IMapper mapper)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _httpContext = httpContextAccessor.HttpContext;
+            _mapper = mapper;
         }
 
 
@@ -36,18 +39,21 @@ namespace Smartpetrol.Data
             var users = new List<UserModel>();
             foreach (var user in _context.Users.Select(x => x))
             {
-                users.Add(new UserModel
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Name = user.FirstName,
-                    RoleFullNames = string.Join(", ", (await _userManager.GetRolesAsync(user))),
-                });
+                var userModel = _mapper.Map<UserModel>(user);
+                userModel.RoleFullNames = string.Join(", ", await GetRolesNamesAsync(user));
+                users.Add(userModel);
             }
-
+            
             return users;
         }
-        
+
+        private async Task<List<string>> GetRolesNamesAsync(User user)
+        {
+            if (user == null) return new List<string>();
+            return (await _userManager.GetRolesAsync(user)).ToEnumList<RoleName>()
+                .Select(x => x.GetDisplayNameAttribute()).ToList();
+        }
+
         private async Task<List<string>> GetRolesAsync(User user)
         {
             if (user == null) return new List<string>();
@@ -72,7 +78,7 @@ namespace Smartpetrol.Data
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterUserViewModel model)
         {
-            var user = new User {UserName = model.Email, Email = model.Email, FirstName = model.FirstName};
+            var user = new User { UserName = model.Email, Email = model.Email, FirstName = model.FirstName };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded) return result;

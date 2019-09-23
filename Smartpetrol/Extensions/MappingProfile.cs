@@ -15,6 +15,9 @@ namespace Smartpetrol.Extensions
         {
             CreateMap<Book, BookViewModel>();
             CreateMap<BookViewModel, Book>();
+
+            CreateMap<User, UserModel>()
+                .ForMember(x => x.RoleFullNames, o => o.Ignore());
         }
     }
 }
