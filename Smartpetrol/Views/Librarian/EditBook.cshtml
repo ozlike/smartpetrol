@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewData["Title"] = "EditBook";
+}
+
+<h2>EditBook</h2>
+
+@using Smartpetrol.Data
+@model Smartpetrol.Models.Books.BookViewModel
+
+<div class="content">
+    <h2 class="main-title">Редактирование книги</h2>
+    @using (Html.BeginForm("EditBook", "Librarian", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <label asp-for="Title" class="middle-sign"></label>
+        <input asp-for="Title" type="text" autocomplete="false" class="input-text" />
+        <span asp-validation-for="Title"></span>
+
+        <label asp-for="Author" class="middle-sign"></label>
+        <input asp-for="Author" type="text" autocomplete="false" class="input-text" />
+        <span asp-validation-for="Author"></span>
+
+        <label asp-for="Genre" class="middle-sign"></label>
+        <input asp-for="Genre" type="text" autocomplete="false" class="input-text" />
+        <span asp-validation-for="Genre"></span>
+
+        <label asp-for="Publisher" class="middle-sign"></label>
+        <input asp-for="Publisher" type="text" autocomplete="false" class="input-text" />
+        <span asp-validation-for="Publisher"></span>
+
+        <div asp-validation-summary="ModelOnly"></div>
+
+        <input type="text" name="Id" value="@Model.Id" hidden />
+
+        <input type="submit" value="Сохранить" class="button no-select" />
+    }
+</div>
+
+
+
+@using (Html.BeginForm("DeleteBook", "Librarian", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="text" name="bookId" value="@Model.Id" hidden />
+    <input type="submit" value="Удалить книгу" class="button no-select" disabled id="deleteBookBtn" />
+}
+
+<label class="no-select">
+    <input type="checkbox" id="deleteBookCheckbox" />
+    Подтвердить удаление
+</label>
+
+<script type="text/javascript">
+    document.getElementById("deleteBookCheckbox").addEventListener("change", function (e) {
+        let btn = document.getElementById("deleteBookBtn");
+        if (e.target.checked) btn.removeAttribute("disabled");
+        else btn.setAttribute("disabled", "disabled");
+    });
+</script>

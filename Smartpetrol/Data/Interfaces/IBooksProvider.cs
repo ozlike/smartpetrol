@@ -8,7 +8,10 @@ namespace Smartpetrol.Data.Interfaces
 {
     public interface IBooksProvider
     {
-        Task CreateBook(CreateBookViewModel model);
-
+        Task CreateBookAsync(BookViewModel model);
+        Task<ICollection<BookViewModel>> GetAllBooksAsync();
+        Task<BookViewModel> GetBookToEditAsync(Guid bookId);
+        Task<bool> EditBookAsync(BookViewModel model);
+        Task<bool> DeleteBookAsync(Guid bookId);
     }
 }

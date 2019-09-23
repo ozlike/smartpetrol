@@ -33,7 +33,6 @@ namespace Smartpetrol.Data
 
         public async Task<ICollection<UserModel>> GetAllUsersAsync()
         {
-            //TODO: Automapper
             var users = new List<UserModel>();
             foreach (var user in _context.Users.Select(x => x))
             {

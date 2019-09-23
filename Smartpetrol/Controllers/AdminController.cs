@@ -43,8 +43,7 @@ namespace Smartpetrol.Controllers
                 return View("ShowMessage", new MessageModel("/Admin/Index", "Пользователь успешно создан", false));
             }
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(string.Empty, error.Description);
+            foreach (var err in result.Errors) ModelState.AddModelError("", err.Description);
             return View(model);
         }
 
@@ -65,6 +64,7 @@ namespace Smartpetrol.Controllers
                 return View("ShowMessage", new MessageModel("/Admin/Index", "Пользователь успешно обновлен", false));
             }
 
+            foreach (var err in result.Errors) ModelState.AddModelError("", err.Description);
             return View(model);
         }
 

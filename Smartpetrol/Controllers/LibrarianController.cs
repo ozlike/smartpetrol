@@ -20,9 +20,9 @@ namespace Smartpetrol.Controllers
             _booksProvider = booksProvider;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult>Index()
         {
-            return View();
+            return View(await _booksProvider.GetAllBooksAsync());
         }
 
         [HttpGet]
@@ -33,11 +33,35 @@ namespace Smartpetrol.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBook(CreateBookViewModel model)
+        public async Task<IActionResult> CreateBook(BookViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-            await _booksProvider.CreateBook(model);
-            return View("ShowMessage", new MessageModel("/Librarian/Index", "Книга успешно создана", false, secondsToRedirect: 1));
+            await _booksProvider.CreateBookAsync(model);
+            return View("ShowMessage",
+                new MessageModel("/Librarian/Index", "Книга успешно создана", false, secondsToRedirect: 1));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult>EditBook(Guid bookId)
+        {
+            return View(await _booksProvider.GetBookToEditAsync(bookId));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditBook(BookViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+            var success = await _booksProvider.EditBookAsync(model);
+            if (!success) return View(model);
+            return View("ShowMessage", new MessageModel("/Librarian/Index", "Книга успешно обновлена", false, 1));
+        }
+        
+        public async Task<IActionResult>DeleteBook(Guid bookId)
+        {
+            var success = await _booksProvider.DeleteBookAsync(bookId);
+            if (success) return View("ShowMessage", new MessageModel("/Librarian/Index", "Книга успешно удалена", false));
+            return View("ShowMessage", new MessageModel("/Librarian/Index", "Произошла ошибки при удалении", true));
         }
     }
 }

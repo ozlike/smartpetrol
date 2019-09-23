@@ -7,8 +7,10 @@ using Smartpetrol.Models.Users;
 
 namespace Smartpetrol.Models.Books
 {
-    public class CreateBookViewModel
+    public class BookViewModel
     {
+        public Guid Id { get; set; }
+
         [Display(Name = "Название книги")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Поле \"{0}\" должно быть заполнено")]
         public string Title { get; set; }
