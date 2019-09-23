@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,58 +15,36 @@ namespace Smartpetrol.Data
     public class BooksProvider : IBooksProvider
     {
         readonly SmartDbContext _context;
+        readonly IMapper _mapper;
 
-        public BooksProvider(SmartDbContext context)
+        public BooksProvider(SmartDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<ICollection<BookViewModel>> GetAllBooksAsync()
         {
-            //TODO: Automapper
-            var books = new List<BookViewModel>();
-            foreach (var book in _context.Books.Select(x => x))
-            {
-                books.Add(new BookViewModel
-                {
-                    Id = book.Id,
-                    Genre = book.Genre,
-                    Author = book.Author,
-                    Publisher =  book.Publisher,
-                    Title = book.Title,
-                });
-            }
-
-            return books;
+            return await _context.Books.Select(x => _mapper.Map<BookViewModel>(x)).ToListAsync();
         }
 
         public async Task<BookViewModel> GetBookToEditAsync(Guid bookId)
         {
             if (bookId == Guid.Empty) return null;
-            var book = await GetBookByIdAsync(bookId);
-
-            var model = new BookViewModel
-            {
-                Id = book.Id,
-                Genre = book.Genre,
-                Author = book.Author,
-                Publisher = book.Publisher,
-                Title = book.Title,
-            };
-
-            return model;
+            return _mapper.Map<BookViewModel>(await GetBookByIdAsync(bookId));
         }
 
         public async Task<bool> EditBookAsync(BookViewModel model)
         {
-            var book = await GetBookByIdAsync(model.Id);
-            if (book == null) return false;
-            book.Genre = model.Genre;
-            book.Author = model.Author;
-            book.Publisher = model.Publisher;
-            book.Title = model.Title;
-            await _context.SaveChangesAsync();
-            return true;
+            try
+            {
+                _context.Update(_mapper.Map<Book>(model));
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e) { }
+
+            return false;
         }
 
         public async Task<bool> DeleteBookAsync(Guid bookId)
@@ -81,13 +60,7 @@ namespace Smartpetrol.Data
 
         public async Task CreateBookAsync(BookViewModel model)
         {
-            await _context.Books.AddAsync(new Book
-            {
-                Author = model.Author,
-                Genre =  model.Genre,
-                Title = model.Title,
-                Publisher = model.Publisher,
-            });
+            await _context.Books.AddAsync(_mapper.Map<Book>(model));
             await _context.SaveChangesAsync();
         }
 

@@ -38,7 +38,7 @@ namespace Smartpetrol.Controllers
             if (!ModelState.IsValid) return View(model);
             await _booksProvider.CreateBookAsync(model);
             return View("ShowMessage",
-                new MessageModel("/Librarian/Index", "Книга успешно создана", false, secondsToRedirect: 1));
+                new MessageModel("/Librarian/Index", "Книга успешно создана", false, 1));
         }
 
         [HttpGet]
@@ -60,8 +60,8 @@ namespace Smartpetrol.Controllers
         public async Task<IActionResult>DeleteBook(Guid bookId)
         {
             var success = await _booksProvider.DeleteBookAsync(bookId);
-            if (success) return View("ShowMessage", new MessageModel("/Librarian/Index", "Книга успешно удалена", false));
-            return View("ShowMessage", new MessageModel("/Librarian/Index", "Произошла ошибки при удалении", true));
+            if (success) return View("ShowMessage", new MessageModel("/Librarian/Index", "Книга успешно удалена", false, 1));
+            return View("ShowMessage", new MessageModel("/Librarian/Index", "Произошла ошибки при удалении", true, 1));
         }
     }
 }

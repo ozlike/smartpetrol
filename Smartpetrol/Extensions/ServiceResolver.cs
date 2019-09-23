@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
@@ -27,7 +28,13 @@ namespace Smartpetrol.Extensions
 
             container.Register(Component.For<IUserProvider>().ImplementedBy<UserProvider>().LifestyleTransient());
             container.Register(Component.For<IBooksProvider>().ImplementedBy<BooksProvider>().LifestyleTransient());
-            //container.Register(Component.For<IMapper>());
+
+            var mappingConfig = new MapperConfiguration(option =>
+            {
+                option.AddProfile(new MappingProfile());
+            });
+            IMapper mapper = mappingConfig.CreateMapper();
+            container.Register(Component.For<IMapper>().LifestyleSingleton().UsingFactoryMethod(() => mapper));
 
             serviceProvider = WindsorRegistrationHelper.CreateServiceProvider(container, services);
 
