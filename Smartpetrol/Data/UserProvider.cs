@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Smartpetrol.Data.Interfaces;
 using Smartpetrol.Extensions;
 using Smartpetrol.Models;
+using Smartpetrol.Models.Books;
 using Smartpetrol.Models.Users;
 
 namespace Smartpetrol.Data
@@ -51,7 +52,7 @@ namespace Smartpetrol.Data
         {
             if (user == null) return new List<string>();
             return (await _userManager.GetRolesAsync(user)).ToEnumList<RoleName>()
-                .Select(x => x.GetDisplayNameAttribute()).ToList();
+                .Select(x => x.GetDisplayName()).ToList();
         }
 
         private async Task<List<string>> GetRolesAsync(User user)
@@ -240,12 +241,22 @@ namespace Smartpetrol.Data
             if (await IsLastAdminAsync(user)) return IdentityResult.Failed();
 
             var userRoles = await _userManager.GetRolesAsync(user);
+            var userBooks = await _context.Books.Where(x => x.TenantId == user.Id).ToListAsync();
 
             using (var transaction = _context.Database.BeginTransaction())
             {
                 foreach (var role in userRoles)
                 {
                     results.Add(await _userManager.RemoveFromRoleAsync(user, role));
+                }
+
+                foreach (var book in userBooks)
+                {
+                    book.RentalTime = null;
+                    book.ReservationTime = null;
+                    book.Status = BookStatus.Free;
+                    book.Tenant = null;
+                    book.TenantId = null;
                 }
 
                 results.Add(await _userManager.DeleteAsync(user));

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Smartpetrol.Configuration;
 using Smartpetrol.Data;
 using Smartpetrol.Extensions;
 using Smartpetrol.Models;
@@ -38,9 +39,14 @@ namespace Smartpetrol
             });
 
 
+            //services.AddDbContext<SmartDbContext>(options =>
+            //    options.UseNpgsql(
+            //        Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDbContext<SmartDbContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
+
+            GlobalValues.ReservationHours = Configuration.GetValue<int>("ReservationHours");
 
             services.AddIdentity<User, IdentityRole>(options =>
             {

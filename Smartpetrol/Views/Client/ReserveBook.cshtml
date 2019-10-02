@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewData["Title"] = "ReserveBook";
+}
+
+@model Smartpetrol.Models.Books.BookViewModel
+
+<h2>ReserveBook</h2>
+
+
+<div>Навание: @Model.Title</div>
+<div>Автор: @Model.Author</div>
+<div>Жанр:  @Model.Genre</div>
+<div>Издатель: @Model.Publisher</div>
+
+
+@using (Html.BeginForm("ReserveBook", "Client", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="text" name="Id" value="@Model.Id" hidden />
+    <input type="submit" value="Забронировать книгу" class="button no-select" />
+}

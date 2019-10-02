@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smartpetrol.Data;
 
 namespace Smartpetrol.Migrations
 {
     [DbContext(typeof(SmartDbContext))]
-    partial class SmartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190930081717_AddTenant")]
+    partial class AddTenant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,13 +196,11 @@ namespace Smartpetrol.Migrations
 
                     b.Property<string>("Genre");
 
+                    b.Property<bool>("IsRented");
+
+                    b.Property<bool>("IsReserved");
+
                     b.Property<string>("Publisher");
-
-                    b.Property<DateTime?>("RentalTime");
-
-                    b.Property<DateTime?>("ReservationTime");
-
-                    b.Property<int>("Status");
 
                     b.Property<string>("TenantId");
 

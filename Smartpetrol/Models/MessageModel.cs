@@ -15,7 +15,7 @@ namespace Smartpetrol.Models
 
         public MessageModel() { }
 
-        public MessageModel(string url, string message, bool error, int secondsToRedirect = 2)
+        public MessageModel(string url, string message, bool error = false, int secondsToRedirect = 2)
         {
             Url = url;
             Message = message;

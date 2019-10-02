@@ -17,6 +17,11 @@
             <link href="@path" rel="stylesheet" asp-append-version="true" />
         }
     }
+
+
+            <link href="~/css/admin/index.css" rel="stylesheet" />@*qwerty*@
+
+
 </head>
 <body>
     <nav>
@@ -27,12 +32,28 @@
 
             @if (userProvider.IsAuthenticated)
             {
+                if (await userProvider.UserHasRoleAsync(RoleName.Client))
+                {
+                    <li>
+                        <a href="@Url.Action("Index", "Client")">Бронирование книг</a>
+                    </li>
+
+                    <li>
+                        <a href="@Url.Action("RentedBooks", "Client")">Арендованные книги</a>
+                    </li>
+                }
 
                 if (await userProvider.UserHasRoleAsync(RoleName.Librarian))
                 {
                     <li>
+                        <a href="@Url.Action("BookDelivery", "Librarian")">Выдача книг</a>
+                    </li>
+                    <li>
                         <a href="@Url.Action("Index", "Librarian")">Управление книгами</a>
                     </li>
+                    <li>
+                        <a href="@Url.Action("RentedBooks", "Librarian")">Принять книги</a>
+                    </li>                    
                 }
 
                 if (await userProvider.UserHasRoleAsync(RoleName.Admin))

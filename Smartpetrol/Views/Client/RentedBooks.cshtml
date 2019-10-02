@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewData["Title"] = "RentedBooks";
+}
+
+<h2>RentedBooks</h2>
+
+@model List<Smartpetrol.Models.Books.BookViewModel>
+
+<table class="users-table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Автор</th>
+            <th>Жанр</th>
+            <th>Издатель</th>
+            <th>Дата начала аренды</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.Genre</td>
+                <td>@book.Publisher</td>
+                <td>@(book.RentalTime.Value.ToLocalTime().ToString("dd MMM. HH:mm", new System.Globalization.CultureInfo("ru-ru")))</td>
+            </tr>
+        }
+    </tbody>
+</table>

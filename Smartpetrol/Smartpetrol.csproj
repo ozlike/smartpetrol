@@ -1,8 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190930081507_AddTenant.cs" />
+    <Compile Remove="Migrations\20190930081507_AddTenant.Designer.cs" />
+    <Compile Remove="Migrations\20190930084409_AddState.cs" />
+    <Compile Remove="Migrations\20190930084409_AddState.Designer.cs" />
+    <Compile Remove="Migrations\20190930134835_BookStatus.cs" />
+    <Compile Remove="Migrations\20190930134835_BookStatus.Designer.cs" />
+    <Compile Remove="Migrations\20190930135450_BookStatus.cs" />
+    <Compile Remove="Migrations\20190930135450_BookStatus.Designer.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />

@@ -27,7 +27,8 @@ namespace Smartpetrol.Extensions
             container = new WindsorContainer();
 
             container.Register(Component.For<IUserProvider>().ImplementedBy<UserProvider>().LifestyleTransient());
-            container.Register(Component.For<IBooksProvider>().ImplementedBy<BooksProvider>().LifestyleTransient());
+            container.Register(Component.For<IBookProvider>().ImplementedBy<BookProvider>().LifestyleTransient());
+            container.Register(Component.For<IClientProvider>().ImplementedBy<ClientProvider>().LifestyleTransient());
 
             var mappingConfig = new MapperConfiguration(option =>
             {

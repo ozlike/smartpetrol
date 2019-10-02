@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewData["Title"] = "GiveOutBook";
+}
+
+<h2>GiveOutBook</h2>
+
+
+
+<div>Навание: @Model.Title</div>
+<div>Автор: @Model.Author</div>
+<div>Жанр:  @Model.Genre</div>
+<div>Издатель: @Model.Publisher</div>
+
+
+@using (Html.BeginForm("GiveOutBook", "Librarian", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="text" name="Id" value="@Model.Id" hidden />
+    <input type="submit" value="Выдать книгу" class="button no-select" />
+}

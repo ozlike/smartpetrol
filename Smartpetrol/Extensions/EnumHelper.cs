@@ -10,7 +10,7 @@ namespace Smartpetrol.Extensions
 {
     public static class EnumHelper
     {
-        public static string GetDisplayNameAttribute(this Enum enumValue)
+        public static string GetDisplayName(this Enum enumValue)
         {
             var attr = enumValue.GetType()
                 .GetMember(enumValue.ToString())
@@ -21,14 +21,7 @@ namespace Smartpetrol.Extensions
 
         public static List<T> GetValues<T>()
         {
-            var values = new List<T>();
-
-            foreach (var val in Enum.GetValues(typeof(T)))
-            {
-                values.Add((T) val);
-            }
-
-            return values;
+            return Enum.GetValues(typeof(T)).OfType<T>().ToList();
         }
 
         public static List<T> ToEnumList<T>(this ICollection<string> valuesList)

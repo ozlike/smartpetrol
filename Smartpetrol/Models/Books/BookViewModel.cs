@@ -10,7 +10,11 @@ namespace Smartpetrol.Models.Books
     public class BookViewModel
     {
         public Guid Id { get; set; }
-
+        public BookStatus Status { get; set; }
+        public DateTime? ReservationTime { get; set; }
+        public DateTime? RentalTime { get; set; }
+        public DateTime? ReservationEndTime { get; set; }
+        
         [Display(Name = "Название книги")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Поле \"{0}\" должно быть заполнено")]
         public string Title { get; set; }
